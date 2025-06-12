@@ -21,7 +21,8 @@ y5 <- (Y[,5]-mean(Y[,5]))/sd(Y[,5])
 y6 <- (Y[,6]-mean(Y[,6]))/sd(Y[,6])
 y7 <- (Y[,7]-mean(Y[,7]))/sd(Y[,7])
 datastandar <- data.frame(x1=c(y1),x2=c(y2),x3=c(y3),x4=c(y4),x5=c(y5),x6=c(y6),x7=c(y7))
-#Matriks X
+
+##Matriks X
 X <- as.matrix(datastandar)
 X
 
@@ -196,55 +197,44 @@ grid3d(c("x", "y", "z"))
 abclines3d(0,0,0,a=diag(3),col="black",lwd=1)
 
 #----- Identifikasi Hasil PCA Biplot -----#
-#Matriks Korelasi Kosinus antar Variabel
-korelasi_cosinus <- function(X) {
+#Korelasi Kosinus antar Variabel
+korelasi_var <- function(H) {
   library(geometry)
-  p <- nrow(X)
+  p <- nrow(H)
   r <- matrix(,nrow=p,ncol=p)
-  for (i in 1:nrow(X)) {
-    for (j in 1:nrow(X)) {
-      r[i,j] <- dot(X[i,],X[j,]) /
-        (sqrt(sum(X[i,]^2)) *
-           sqrt(sum(X[j,]^2)))
+  for (i in 1:p) {
+    for (j in 1:p) {
+      r[i,j] <- dot(H[i,],H[j,]) /
+        (sqrt(sum(H[i,]^2)) * sqrt(sum(H[j,]^2)))
     }
   }
   print(r)
 }
-korvar3 <- korelasi_cosinus(H3)
-korvar_3 <- round(korvar3,3);korvar_3
+korvar3 <- korelasi_var(H3)
+round(korvar3,3)
 
 #Nilai Variabel pada Suatu Objek
-cosine_correlation <- function(G, H) {
-  # Inisialisasi jumlah objek dan variabel
-  n <- nrow(G)  # Jumlah objek (baris di matriks G)
-  p <- nrow(H)  # Jumlah variabel (baris di matriks H)
-  # Matriks korelasi kosinus, diinisialisasi dengan nilai 0
-  rho <- matrix(0, n, p)
-  # Loop untuk menghitung korelasi kosinus antara setiap objek dan variabel
+korelasi_obvar <- function(G,H) {
+  library(geometry)
+  n <- nrow(G)
+  p <- nrow(H)
+  r <- matrix(,nrow=n,ncol=p)
   for (i in 1:n) {
     for (j in 1:p) {
-      # Menghitung pembilang (dot product antara baris i G dan baris j H)
-      numerator <- sum(G[i, ] * H[j, ])
-      # Menghitung penyebut (akar dari jumlah kuadrat elemen pada baris i G dan baris j H)
-      denominator <- sqrt(sum(G[i, ]^2) * sum(H[j, ]^2))
-      # Menghitung korelasi kosinus
-      rho[i, j] <- numerator / denominator
+      r[i,j] <- dot(G[i,],H[j,]) /
+        (sqrt(sum(G[i,]^2)) * sqrt(sum(H[j,]^2)))
     }
   }
-  return(rho)
+  print(r)
 }
-obvar3<- cosine_correlation(G3, H3)
-obvar_3 <- round(obvar3,3);obvar_3
+korobvar3 <- korelasi_obvar(H3)
+round(korobvar3,3)
 
 #----- Analisis Klaster Hierarki -----#
 #Menghitung Jarak Cosine
-# Fungsi Cosinus Similarity
 cosine_similarity <- function(x) {
-  # Menghitung dot product antar semua baris
   similarity_matrix <- x %*% t(x)
-  # Menghitung norma (panjang vektor) untuk setiap baris
   norms <- sqrt(rowSums(x^2))
-  # Membagi dot product dengan hasil kali norma untuk setiap pasangan baris
   similarity_matrix <- similarity_matrix / outer(norms, norms)
   return(similarity_matrix)
 }
